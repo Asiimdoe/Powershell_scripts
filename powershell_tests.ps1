@@ -5,3 +5,6 @@
  }
 
 $test.Processes[1]
+
+$userId = "vnelep@traffix.com"
+Get-MgUserChat -UserId $userId

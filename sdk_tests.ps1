@@ -1,21 +1,18 @@
 ﻿Import-Module Microsoft.Graph.Mail
 Connect-MgGraph -Scopes "Mail.Read", "User.Read.All"
 $userId = "hokrushko@traffix.com"
+$outfile = "C:\Users\Asiimdoe\Documents\Scripts\Retrieve_emails\Tests"
+$num = 0
 
-$message = Get-MgUserMessage -UserId $userId -MessageId "AAMkADAyNGIzMzYzLTJkMTUtNGJlOC1hYjMwLWU4ODdiZGE4MWVkOQBGAAAAAACdXaJBTjyCQ4y7I9KV8MWBBwBtBwi9D4XITqOxOUsKJWcLAAAAAAEPAABtBwi9D4XITqOxOUsKJWcLAAGV3EUTAAA="
+$messages = Get-MgUserMessage -Top 50 -UserId $userId
 
-"test"
-Select-Object $message 
-"test"
-
-$message | Format-List *
-
-$message.From
-1
-2
+foreach ($message in $messages)
+{
+Get-MgUserMessageAttachment -UserId $userId -MessageId $message.id -All
+$num++
 $message.From.EmailAddress.Name
-2
-3
-$message.ToRecipients
-3
+$message.Subject
+}
+
+
 #Get-MgUserMessageAttachment -All -MessageId Any -UserId $userId

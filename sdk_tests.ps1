@@ -3,9 +3,8 @@ Connect-MgGraph -Scopes "Mail.Read", "User.Read.All"
 $userId = "hokrushko@traffix.com"
 $outfile = "C:\Users\Asiimdoe\Documents\Scripts\Retrieve_emails\Tests"
 $num = 0
-$well 
 
-$messages = Get-MgUserMessage -Top 10 -UserId $userId
+$messages = Get-MgUserMessage -All -UserId $userId -Property id
 $messages.Count
 #Start-Sleep -Seconds 5
 
@@ -15,22 +14,17 @@ $attachments = Get-MgUserMessageAttachment -UserId $userId -MessageId $message.i
 foreach ($attachment in $attachments) 
 {
   if ($attachment.AdditionalProperties["@odata.type"] -eq "#microsoft.graph.fileAttachment" -and $attachment.Name -like "*.*") {
-        
-        
-        # Convert the base64 content back to a physical file
+       
+        #convert from base64 to readable
         $Bytes = [System.Convert]::FromBase64String($attachment.AdditionalProperties["contentBytes"])
-        $OutputPath = Join-Path $outfile $attachment.Name
+        $OutputPath = "$($outfile)\$($num)_$($attachment.Name)"
         
         [System.IO.File]::WriteAllBytes($OutputPath, $Bytes)
         Write-Host "Saved: $($attachment.Name) from $($message.Subject)"
     }
 }
 
-#Get-MgUserMessageContent -UserId $userId -MessageId $message.id -OutFile $outfile\$num
 $num++
 $message.From.EmailAddress.Name
 $message.Subject
 }
-
-
-#Get-MgUserMessageAttachment -All -MessageId Any -UserId $userId

@@ -5,21 +5,31 @@ $outfile = "C:\Users\Asiimdoe\Documents\Scripts\Retrieve_emails\Tests"
 $num = 0
 $well 
 
-"TEST"
-#Get-MgUserMessage -Top 1000 -UserId $userId 
-"Test is over"
-
-$messages = Get-MgUserMessage -Top 100000 -UserId $userId
+$messages = Get-MgUserMessage -Top 10 -UserId $userId
 $messages.Count
-Start-Sleep -Seconds 10
+#Start-Sleep -Seconds 5
+
 foreach ($message in $messages)
 {
-Get-MgUserMessageAttachment -UserId $userId -MessageId $message.id 
-Get-MgUserMessageContent -UserId $userId -MessageId $message.id -OutFile $outfile\$num
+$attachments = Get-MgUserMessageAttachment -UserId $userId -MessageId $message.id 
+foreach ($attachment in $attachments) 
+{
+  if ($attachment.AdditionalProperties["@odata.type"] -eq "#microsoft.graph.fileAttachment" -and $attachment.Name -like "*.*") {
+        
+        
+        # Convert the base64 content back to a physical file
+        $Bytes = [System.Convert]::FromBase64String($attachment.AdditionalProperties["contentBytes"])
+        $OutputPath = Join-Path $outfile $attachment.Name
+        
+        [System.IO.File]::WriteAllBytes($OutputPath, $Bytes)
+        Write-Host "Saved: $($attachment.Name) from $($message.Subject)"
+    }
+}
+
+#Get-MgUserMessageContent -UserId $userId -MessageId $message.id -OutFile $outfile\$num
 $num++
 $message.From.EmailAddress.Name
 $message.Subject
-
 }
 
 
